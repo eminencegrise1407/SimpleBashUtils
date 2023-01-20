@@ -112,14 +112,6 @@ int command_line_out(char *pattern, options Options, char *filename) {
             }
         }
 
-        if (Options.c && !Options.l) {
-            if (Options.notOneFile) {
-                printf("%s:%d\n", filename, counter);
-            } else {
-                printf("%d\n", counter);
-            }
-        }
-
         if (Options.c && Options.l) {
             if (counter == 0) {
                 counter = 0;
