@@ -42,6 +42,14 @@ int parser(int argc, char **argv, options *Options) {
             break;
         }
     }
+//   if (needOpt == 1) {
+//     Options->e = 1;
+//     Options->noOpt = 1;
+//   }
+
+//   if (optind + 2 < argc) {
+//     Options->notOneFile = 1;
+//   }
     return flag;    
 }
 
@@ -64,15 +72,23 @@ int command_line_out(char *pattern, options Options, char *filename) {
         while (getline (&buffer, &n, fp) != -1) {
             string_counter++;
             search = regexec(&reg, buffer, 0, NULL, 0);
+//       	    if (Options.i) {
+//         	regfree(&reg);
+// 		regcomp(&reg, pattern, REG_ICASE);
+// 		search = regexec(&reg, str, 0, NULL, 0);
+// 	    }
             if (Options.v) {
                 search = !search;
             }
+//       	    if (Options.h) {
+//         	Options.notOneFile = 0;
+//             }
             if (search == 0) {
                 counter++;
                 if (buffer[strlen(buffer) - 1] != '\n') {
-                int end = strlen(buffer);
-                buffer[end] = '\n';
-                buffer[end + 1] = '\0';
+                    int end = strlen(buffer);
+                    buffer[end] = '\n';
+                    buffer[end + 1] = '\0';
                 }
                 if (Options.c != 1 && Options.l != 1) {
                     if (Options.n) {
@@ -87,6 +103,31 @@ int command_line_out(char *pattern, options Options, char *filename) {
                 }
             }
         }
+//     if (Options.c && !Options.l) {
+//       if (Options.notOneFile) {
+//         printf("%s:%d\n", file, counter);
+//       } else {
+//         printf("%d\n", counter);
+//       }
+//     }
+
+//     if (Options.c && Options.l) {
+//       if (counter == 0) {
+//         counter = 0;
+//       } else {
+//         counter = 1;
+//       }
+//       if (Options.notOneFile) {
+//         printf("%s:%d\n", file, counter);
+//       } else {
+//         printf("%d\n", counter);
+//       }
+//     }
+
+//     if (Options.l && counter != 0) {
+//       counter = 1;
+//       printf("%s\n", file);
+//     }
         fclose(fp);
     }
     regfree(&reg);
