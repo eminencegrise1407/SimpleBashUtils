@@ -1,5 +1,6 @@
 #include "options.h"
-
+// flag -c works twice
+// add -o -f
 int parser(int argc, char **argv, options *Options) {
     int res = 0;
     int flag = 1;
@@ -47,9 +48,9 @@ int parser(int argc, char **argv, options *Options) {
 //     Options->noOpt = 1;
 //   }
 
-//   if (optind + 2 < argc) {
-//     Options->notOneFile = 1;
-//   }
+    if (optind + 2 < argc) {
+        Options->notOneFile = 1;
+    }
     return flag;    
 }
 
@@ -72,17 +73,17 @@ int command_line_out(char *pattern, options Options, char *filename) {
         while (getline (&buffer, &n, fp) != -1) {
             string_counter++;
             search = regexec(&reg, buffer, 0, NULL, 0);
-//       	    if (Options.i) {
-//         	regfree(&reg);
-// 		regcomp(&reg, pattern, REG_ICASE);
-// 		search = regexec(&reg, str, 0, NULL, 0);
-// 	    }
+        if (Options.i) {
+        	regfree(&reg);
+		    regcomp(&reg, pattern, REG_ICASE);
+		    search = regexec(&reg, buffer, 0, NULL, 0);
+	    }
             if (Options.v) {
                 search = !search;
             }
-//       	    if (Options.h) {
-//         	Options.notOneFile = 0;
-//             }
+        if (Options.h) {
+                Options.notOneFile = 0;
+        }
             if (search == 0) {
                 counter++;
                 if (buffer[strlen(buffer) - 1] != '\n') {
@@ -91,11 +92,11 @@ int command_line_out(char *pattern, options Options, char *filename) {
                     buffer[end + 1] = '\0';
                 }
                 if (Options.c != 1 && Options.l != 1) {
-                    if (Options.n) {
+                    if (Options.notOneFile && Options.n) {
                         printf("%s:%d:%s", filename, string_counter, buffer);
-                    } else if (!Options.n) {
+                    } else if (Options.notOneFile && !Options.n) {
                         printf("%s:%s", filename, buffer);
-                    } else if (Options.n) {
+                    } else if (!Options.notOneFile && Options.n) {
                         printf("%d:%s", string_counter, buffer);
                     } else {
                         printf("%s", buffer);
@@ -103,31 +104,40 @@ int command_line_out(char *pattern, options Options, char *filename) {
                 }
             }
         }
-//     if (Options.c && !Options.l) {
-//       if (Options.notOneFile) {
-//         printf("%s:%d\n", file, counter);
-//       } else {
-//         printf("%d\n", counter);
-//       }
-//     }
+        if (Options.c && !Options.l) {
+            if (Options.notOneFile) {
+                printf("%s:%d\n", filename, counter);
+            } else {
+                printf("%d\n", counter);
+            }
+        }
 
-//     if (Options.c && Options.l) {
-//       if (counter == 0) {
-//         counter = 0;
-//       } else {
-//         counter = 1;
-//       }
-//       if (Options.notOneFile) {
-//         printf("%s:%d\n", file, counter);
-//       } else {
-//         printf("%d\n", counter);
-//       }
-//     }
+        if (Options.c && !Options.l) {
+            if (Options.notOneFile) {
+                printf("%s:%d\n", filename, counter);
+            } else {
+                printf("%d\n", counter);
+            }
+        }
 
-//     if (Options.l && counter != 0) {
-//       counter = 1;
-//       printf("%s\n", file);
-//     }
+        if (Options.c && Options.l) {
+            if (counter == 0) {
+                counter = 0;
+            } else {
+                counter = 1;
+            }
+            if (Options.notOneFile) {
+                printf("%s:%d\n", filename, counter);
+            } else {
+                printf("%d\n", counter);
+            }
+        }
+
+        if (Options.l && counter != 0) {
+            counter = 1;
+            printf("%s\n", filename);
+        }
+
         fclose(fp);
     }
     regfree(&reg);
